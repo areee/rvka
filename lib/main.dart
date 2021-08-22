@@ -28,14 +28,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,20 +38,68 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'Painoit nappia näin monta kertaa:',
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Liitä tähän kuitti',
+                style: Theme.of(context).textTheme.bodyText1,
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+              child: TextField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Liitettävä kaupan kuitti',
+                ),
+                maxLines: 5,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(onPressed: () {}, child: Text('Generoi')),
+            ),
+            DataTable(
+              columns: const <DataColumn>[
+                DataColumn(
+                  label: Text(
+                    'EAN-koodi',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Tuotteen nimi',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Tuotteiden määrä',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Tuotteen hinta (€/kpl)',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                ),
+              ],
+              rows: const <DataRow>[
+                DataRow(
+                  cells: <DataCell>[
+                    DataCell(Text('6417700052767')),
+                    DataCell(
+                        Text('Myllyn Paras Sportti Täysjyväspagetti 500 G')),
+                    DataCell(Text('1')),
+                    DataCell(Text('1,59')),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Kasvata',
-        child: Icon(Icons.add),
       ),
     );
   }
