@@ -1,3 +1,5 @@
+import 'package:file_selector/file_selector.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -29,12 +31,40 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _contentController = TextEditingController();
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  Future<void> _openTextFile(BuildContext context) async {
+    final XTypeGroup typeGroup = XTypeGroup(
+      label: 'text',
+      extensions: <String>['txt', 'html'],
+    );
+    final XFile? file =
+        await openFile(acceptedTypeGroups: <XTypeGroup>[typeGroup]);
+
+    if (file == null) return;
+
+    final String fileName = file.name;
+    final String fileContent = await file.readAsString();
+
+    print(fileName);
+    print(fileContent);
+  }
+
+  Future<void> _saveTextFile() async {
+    final String fileName = _nameController.text;
+
+    final String? path = await getSavePath(suggestedName: fileName);
+
+    if (path == null) return;
+
+    final String text = _contentController.text;
+    final Uint8List fileData = Uint8List.fromList(text.codeUnits);
+    const String fileMimeType = 'text/plain';
+    final XFile textFile =
+        XFile.fromData(fileData, mimeType: fileMimeType, name: fileName);
+
+    await textFile.saveTo(path);
   }
 
   @override
@@ -42,26 +72,49 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        centerTitle: true,
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+            ElevatedButton(
+                onPressed: () => _openTextFile(context),
+                child: const Text('Select a file')),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: 300,
+              child: TextField(
+                minLines: 1,
+                maxLines: 12,
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  hintText: '(Optional) Suggest File Name',
+                ),
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            SizedBox(
+              width: 300,
+              child: TextField(
+                minLines: 1,
+                maxLines: 12,
+                controller: _contentController,
+                decoration: const InputDecoration(
+                  hintText: 'Enter File Contents',
+                ),
+              ),
             ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+                onPressed: () => _saveTextFile(),
+                child: const Text('Save a file')),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
     );
   }
+
+  // void openFile(PlatformFile file) {
+  //   OpenFile(file.path!);
+  // }
 }
