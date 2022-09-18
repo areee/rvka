@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -59,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (path == null) return;
 
     final String text = _contentController.text;
-    final Uint8List fileData = Uint8List.fromList(text.codeUnits);
+    final Uint8List fileData = Uint8List.fromList(utf8.encode(text));
     const String fileMimeType = 'text/plain';
     final XFile textFile =
         XFile.fromData(fileData, mimeType: fileMimeType, name: fileName);
