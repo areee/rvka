@@ -38,8 +38,8 @@ class _MyHomePageState extends State<MyHomePage> {
   // final TextEditingController _nameController = TextEditingController();
   // final TextEditingController _contentController = TextEditingController();
 
-  String _textFilePath = "";
-  String _htmlFilePath = "";
+  String _textFilePath = "A text file path goes here";
+  String _htmlFilePath = "An HTML file path goes here";
 
   Future<void> _openTextFile(BuildContext context) async {
     final XTypeGroup typeGroup = XTypeGroup(
@@ -102,12 +102,12 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'Select a web store',
-              style: TextStyle(fontSize: 20),
-            ),
+            // const Text(
+            //   'Select a web store',
+            //   style: TextStyle(fontSize: 20),
+            // ),
             // TODO: Add two radio buttons for selecting the web store
-            const SizedBox(height: 10),
+            // const SizedBox(height: 10),
             const Text(
               'Select a text file',
               style: TextStyle(fontSize: 20),
