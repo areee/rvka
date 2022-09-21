@@ -39,11 +39,12 @@ class _MyHomePageState extends State<MyHomePage> {
   // final TextEditingController _contentController = TextEditingController();
 
   String _textFilePath = "";
+  String _htmlFilePath = "";
 
   Future<void> _openTextFile(BuildContext context) async {
     final XTypeGroup typeGroup = XTypeGroup(
       label: 'text',
-      extensions: <String>['txt', 'html'],
+      extensions: <String>['txt'],
     );
     final XFile? file =
         await openFile(acceptedTypeGroups: <XTypeGroup>[typeGroup]);
@@ -54,6 +55,23 @@ class _MyHomePageState extends State<MyHomePage> {
 
     setState(() {
       _textFilePath = filePath;
+    });
+  }
+
+  Future<void> _openHtmlFile(BuildContext context) async {
+    final XTypeGroup typeGroup = XTypeGroup(
+      label: 'HTML',
+      extensions: <String>['html'],
+    );
+    final XFile? file =
+        await openFile(acceptedTypeGroups: <XTypeGroup>[typeGroup]);
+
+    if (file == null) return;
+
+    final String filePath = file.path;
+
+    setState(() {
+      _htmlFilePath = filePath;
     });
   }
 
@@ -85,6 +103,12 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
+              'Select a web store',
+              style: TextStyle(fontSize: 20),
+            ),
+            // TODO: Add two radio buttons for selecting the web store
+            const SizedBox(height: 10),
+            const Text(
               'Select a text file',
               style: TextStyle(fontSize: 20),
             ),
@@ -92,6 +116,16 @@ class _MyHomePageState extends State<MyHomePage> {
               text: _textFilePath,
               buttonText: 'Open text file',
               onPressed: () => _openTextFile(context),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Select a HTML file',
+              style: TextStyle(fontSize: 20),
+            ),
+            TextAndButton(
+              text: _htmlFilePath,
+              buttonText: 'Open HTML file',
+              onPressed: () => _openHtmlFile(context),
             ),
             // Text('Selected text file: $_textFilePath'),
             // ElevatedButton(
@@ -130,10 +164,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-
-  // void openFile(PlatformFile file) {
-  //   OpenFile(file.path!);
-  // }
 }
 
 class TextAndButton extends StatelessWidget {
@@ -149,16 +179,27 @@ class TextAndButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Flexible(
-          child: Text(text),
-        ),
-        ElevatedButton(
-          onPressed: onPressed,
-          child: Text(buttonText),
-        ),
-      ],
+    return SizedBox(
+      width: 450,
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Text(text),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              fixedSize: const Size(100, 40),
+            ),
+            onPressed: onPressed,
+            // Align text to center
+
+            child: Text(
+              buttonText,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
