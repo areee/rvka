@@ -1,5 +1,6 @@
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:rvka/utils/selected_shop_helper.dart';
 
 void main() {
   runApp(const MyApp());
@@ -40,6 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String _textFilePath = "A text file path goes here";
   String _htmlFilePath = "An HTML file path goes here";
+  SelectedShop? _selectedShop = SelectedShop.sKaupat;
 
   Future<void> _openTextFile(BuildContext context) async {
     final XTypeGroup typeGroup = XTypeGroup(
@@ -75,6 +77,12 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void _changeSelectedShop(SelectedShop? value) {
+    setState(() {
+      _selectedShop = value;
+    });
+  }
+
   // Future<void> _saveTextFile() async {
   //   final String fileName = _nameController.text;
 
@@ -102,21 +110,25 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // const Text(
-            //   'Select a web store',
-            //   style: TextStyle(fontSize: 20),
-            // ),
-            // TODO: Add two radio buttons for selecting the web store
-            // const SizedBox(height: 10),
             const Text(
-              'Select a text file',
+              'Select a web store',
               style: TextStyle(fontSize: 20),
             ),
-            TextAndButton(
-              text: _textFilePath,
-              buttonText: 'Open text file',
-              onPressed: () => _openTextFile(context),
-            ),
+            SelectedShopListTiles(
+                selectedShop: _selectedShop,
+                changeSelectedShop: _changeSelectedShop),
+            const SizedBox(height: 10),
+            if (_selectedShop == SelectedShop.sKaupat)
+              const Text(
+                'Select a text file',
+                style: TextStyle(fontSize: 20),
+              ),
+            if (_selectedShop == SelectedShop.sKaupat)
+              TextAndButton(
+                text: _textFilePath,
+                buttonText: 'Open text file',
+                onPressed: () => _openTextFile(context),
+              ),
             const SizedBox(height: 10),
             const Text(
               'Select a HTML file',
@@ -201,5 +213,47 @@ class TextAndButton extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class SelectedShopListTiles extends StatelessWidget {
+  const SelectedShopListTiles({
+    super.key,
+    required this.selectedShop,
+    required this.changeSelectedShop,
+  });
+
+  final SelectedShop? selectedShop;
+  final void Function(SelectedShop?)? changeSelectedShop;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 160,
+            child: ListTile(
+              title: Text(SelectedShop.sKaupat.value),
+              leading: Radio<SelectedShop>(
+                value: SelectedShop.sKaupat,
+                groupValue: selectedShop,
+                onChanged: changeSelectedShop,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 160,
+            child: ListTile(
+              title: Text(SelectedShop.kRuoka.value),
+              leading: Radio<SelectedShop>(
+                value: SelectedShop.kRuoka,
+                groupValue: selectedShop,
+                onChanged: changeSelectedShop,
+              ),
+            ),
+          ),
+        ]);
   }
 }
