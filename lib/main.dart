@@ -2,8 +2,7 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:rvka/utils/selected_file_format_helper.dart';
 import 'package:rvka/utils/selected_shop_helper.dart';
-import 'package:rvka/widgets/selected_file_format_list_tiles.dart';
-import 'package:rvka/widgets/selected_shop_list_tiles.dart';
+import 'package:rvka/widgets/selected_item_list_tiles.dart';
 import 'package:rvka/widgets/text_and_button.dart';
 
 void main() {
@@ -46,8 +45,12 @@ class _MyHomePageState extends State<MyHomePage> {
   String _textFilePath = "A text file path goes here";
   String _htmlFilePath = "An HTML file path goes here";
 
-  SelectedShop? _selectedShop = SelectedShop.sKaupat;
-  SelectedFileFormat? _selectedFileFormat = SelectedFileFormat.excel;
+  String? _selectedShop = SelectedShop.sKaupat.value;
+  final List<String> _shops = SelectedShop.values.map((e) => e.value).toList();
+
+  String? _selectedFileFormat = SelectedFileFormat.excel.value;
+  final List<String> _fileFormats =
+      SelectedFileFormat.values.map((e) => e.value).toList();
 
   Future<void> _openTextFile(BuildContext context) async {
     final XTypeGroup typeGroup = XTypeGroup(
@@ -83,13 +86,13 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _changeSelectedShop(SelectedShop? value) {
+  void _changeSelectedShop(String? value) {
     setState(() {
       _selectedShop = value;
     });
   }
 
-  void _changeSelectedFileFormat(SelectedFileFormat? value) {
+  void _changeSelectedFileFormat(String? value) {
     setState(() {
       _selectedFileFormat = value;
     });
@@ -126,16 +129,18 @@ class _MyHomePageState extends State<MyHomePage> {
               'Select a web store',
               style: TextStyle(fontSize: 20),
             ),
-            SelectedShopListTiles(
-                selectedShop: _selectedShop,
-                changeSelectedShop: _changeSelectedShop),
+            SelectedItemListTiles(
+              items: _shops,
+              selectedItem: _selectedShop,
+              changeSelectedItem: _changeSelectedShop,
+            ),
             const SizedBox(height: 10),
-            if (_selectedShop == SelectedShop.sKaupat)
+            if (_selectedShop == SelectedShop.sKaupat.value)
               const Text(
                 'Select a text file',
                 style: TextStyle(fontSize: 20),
               ),
-            if (_selectedShop == SelectedShop.sKaupat)
+            if (_selectedShop == SelectedShop.sKaupat.value)
               TextAndButton(
                 text: _textFilePath,
                 buttonText: 'Open text file',
@@ -156,9 +161,11 @@ class _MyHomePageState extends State<MyHomePage> {
               'Select an ouput file format',
               style: TextStyle(fontSize: 20),
             ),
-            SelectedFileFormatListTiles(
-                selectedFileFormat: _selectedFileFormat,
-                changeSelectedFileFormat: _changeSelectedFileFormat),
+            SelectedItemListTiles(
+              items: _fileFormats,
+              selectedItem: _selectedFileFormat,
+              changeSelectedItem: _changeSelectedFileFormat,
+            ),
             const SizedBox(height: 10),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -206,83 +213,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
-// class TextAndButton extends StatelessWidget {
-//   const TextAndButton(
-//       {super.key,
-//       required this.text,
-//       required this.buttonText,
-//       required this.onPressed});
-
-//   final String text;
-//   final String buttonText;
-//   final VoidCallback onPressed;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return SizedBox(
-//       width: 450,
-//       child: Row(
-//         children: <Widget>[
-//           Expanded(
-//             child: Text(text),
-//           ),
-//           ElevatedButton(
-//             style: ElevatedButton.styleFrom(
-//               fixedSize: const Size(100, 40),
-//             ),
-//             onPressed: onPressed,
-//             // Align text to center
-
-//             child: Text(
-//               buttonText,
-//               textAlign: TextAlign.center,
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-// class SelectedXListTiles extends StatelessWidget {
-//   const SelectedXListTiles({
-//     super.key,
-//     required this.selectedX,
-//     required this.changeSelectedX,
-//   });
-
-//   final SelectedShop? selectedX;
-//   final void Function(SelectedShop?)? changeSelectedX;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Row(
-//         mainAxisSize: MainAxisSize.min,
-//         mainAxisAlignment: MainAxisAlignment.center,
-//         children: [
-//           SizedBox(
-//             width: 160,
-//             child: ListTile(
-//               title: Text(SelectedShop.sKaupat.value),
-//               leading: Radio<SelectedShop>(
-//                 value: SelectedShop.sKaupat,
-//                 groupValue: selectedX,
-//                 onChanged: changeSelectedX,
-//               ),
-//             ),
-//           ),
-//           SizedBox(
-//             width: 160,
-//             child: ListTile(
-//               title: Text(SelectedShop.kRuoka.value),
-//               leading: Radio<SelectedShop>(
-//                 value: SelectedShop.kRuoka,
-//                 groupValue: selectedX,
-//                 onChanged: changeSelectedX,
-//               ),
-//             ),
-//           ),
-//         ]);
-//   }
-// }
