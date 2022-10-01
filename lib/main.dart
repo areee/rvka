@@ -18,11 +18,13 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
-        primarySwatch: Colors.green,
+        colorSchemeSeed: const Color(0xFF4CAF50),
+        useMaterial3: true,
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        primarySwatch: Colors.green,
+        colorSchemeSeed: const Color(0xFF4CAF50),
+        useMaterial3: true,
       ),
       home: const MyHomePage(title: 'RVKA - Ruokaverkkokaupan apuri'),
     );
@@ -42,8 +44,8 @@ class _MyHomePageState extends State<MyHomePage> {
   // final TextEditingController _nameController = TextEditingController();
   // final TextEditingController _contentController = TextEditingController();
 
-  String _textFilePath = "A text file path goes here";
-  String _htmlFilePath = "An HTML file path goes here";
+  String? _textFilePath;
+  String? _htmlFilePath;
 
   String? _selectedShop = SelectedShop.sKaupat.value;
   final List<String> _shops = SelectedShop.values.map((e) => e.value).toList();
@@ -53,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
       SelectedFileFormat.values.map((e) => e.value).toList();
 
   Future<void> _openTextFile(BuildContext context) async {
-    final XTypeGroup typeGroup = XTypeGroup(
+    const XTypeGroup typeGroup = XTypeGroup(
       label: 'text',
       extensions: <String>['txt'],
     );
@@ -70,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _openHtmlFile(BuildContext context) async {
-    final XTypeGroup typeGroup = XTypeGroup(
+    const XTypeGroup typeGroup = XTypeGroup(
       label: 'HTML',
       extensions: <String>['html'],
     );
@@ -96,6 +98,47 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _selectedFileFormat = value;
     });
+  }
+
+  Future<String?> _showInformationDialog(BuildContext context) {
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Selections you made'),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Selected shop:",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            Text("$_selectedShop"),
+            _selectedShop == SelectedShop.sKaupat.value
+                ? const Text("Selected file format:",
+                    style: TextStyle(fontWeight: FontWeight.bold))
+                : const SizedBox.shrink(),
+            _selectedShop == SelectedShop.sKaupat.value
+                ? _textFilePath == null
+                    ? const Text('Not set')
+                    : Text(_textFilePath!)
+                : const SizedBox.shrink(),
+            const Text("HTML file path:",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            _htmlFilePath == null
+                ? const Text('Not set')
+                : Text(_htmlFilePath!),
+            const Text("Selected file format:",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            Text("$_selectedFileFormat"),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   // Future<void> _saveTextFile() async {
@@ -143,6 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
             if (_selectedShop == SelectedShop.sKaupat.value)
               TextAndButton(
                 text: _textFilePath,
+                textDescription: 'A text',
                 buttonText: 'Open text file',
                 onPressed: () => _openTextFile(context),
               ),
@@ -153,6 +197,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             TextAndButton(
               text: _htmlFilePath,
+              textDescription: 'An HTML',
               buttonText: 'Open HTML file',
               onPressed: () => _openHtmlFile(context),
             ),
@@ -171,7 +216,7 @@ class _MyHomePageState extends State<MyHomePage> {
               style: ElevatedButton.styleFrom(
                 fixedSize: const Size(100, 40),
               ),
-              onPressed: () {},
+              onPressed: () => _showInformationDialog(context),
               child: const Text('Run'),
             ),
             // ====

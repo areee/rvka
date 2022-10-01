@@ -4,10 +4,12 @@ class TextAndButton extends StatelessWidget {
   const TextAndButton(
       {super.key,
       required this.text,
+      required this.textDescription,
       required this.buttonText,
       required this.onPressed});
 
-  final String text;
+  final String? text;
+  final String textDescription;
   final String buttonText;
   final VoidCallback onPressed;
 
@@ -18,15 +20,15 @@ class TextAndButton extends StatelessWidget {
       child: Row(
         children: <Widget>[
           Expanded(
-            child: Text(text),
+            child: text == null
+                ? Text('$textDescription file path goes here')
+                : Text(text!),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               fixedSize: const Size(100, 40),
             ),
             onPressed: onPressed,
-            // Align text to center
-
             child: Text(
               buttonText,
               textAlign: TextAlign.center,
