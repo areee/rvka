@@ -1,4 +1,5 @@
 import 'package:file_selector/file_selector.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:rvka/utils/selected_file_format_helper.dart';
 import 'package:rvka/utils/selected_shop_helper.dart';
@@ -64,7 +65,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (file == null) return;
 
-    final String filePath = file.path;
+    String filePath;
+    if (kIsWeb) {
+      filePath = file.name;
+    } else {
+      filePath = file.path;
+    }
 
     setState(() {
       _textFilePath = filePath;
@@ -81,7 +87,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (file == null) return;
 
-    final String filePath = file.path;
+    String filePath;
+    if (kIsWeb) {
+      filePath = file.name;
+    } else {
+      filePath = file.path;
+    }
 
     setState(() {
       _htmlFilePath = filePath;
