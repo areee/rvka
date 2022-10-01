@@ -1,6 +1,9 @@
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:rvka/utils/selected_file_format_helper.dart';
 import 'package:rvka/utils/selected_shop_helper.dart';
+import 'package:rvka/widgets/selected_item_list_tiles.dart';
+import 'package:rvka/widgets/text_and_button.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,11 +18,13 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
-        primarySwatch: Colors.green,
+        colorSchemeSeed: const Color(0xFF4CAF50),
+        useMaterial3: true,
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        primarySwatch: Colors.green,
+        colorSchemeSeed: const Color(0xFF4CAF50),
+        useMaterial3: true,
       ),
       home: const MyHomePage(title: 'RVKA - Ruokaverkkokaupan apuri'),
     );
@@ -39,12 +44,18 @@ class _MyHomePageState extends State<MyHomePage> {
   // final TextEditingController _nameController = TextEditingController();
   // final TextEditingController _contentController = TextEditingController();
 
-  String _textFilePath = "A text file path goes here";
-  String _htmlFilePath = "An HTML file path goes here";
-  SelectedShop? _selectedShop = SelectedShop.sKaupat;
+  String? _textFilePath;
+  String? _htmlFilePath;
+
+  String? _selectedShop = SelectedShop.sKaupat.value;
+  final List<String> _shops = SelectedShop.values.map((e) => e.value).toList();
+
+  String? _selectedFileFormat = SelectedFileFormat.excel.value;
+  final List<String> _fileFormats =
+      SelectedFileFormat.values.map((e) => e.value).toList();
 
   Future<void> _openTextFile(BuildContext context) async {
-    final XTypeGroup typeGroup = XTypeGroup(
+    const XTypeGroup typeGroup = XTypeGroup(
       label: 'text',
       extensions: <String>['txt'],
     );
@@ -61,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _openHtmlFile(BuildContext context) async {
-    final XTypeGroup typeGroup = XTypeGroup(
+    const XTypeGroup typeGroup = XTypeGroup(
       label: 'HTML',
       extensions: <String>['html'],
     );
@@ -77,10 +88,57 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _changeSelectedShop(SelectedShop? value) {
+  void _changeSelectedShop(String? value) {
     setState(() {
       _selectedShop = value;
     });
+  }
+
+  void _changeSelectedFileFormat(String? value) {
+    setState(() {
+      _selectedFileFormat = value;
+    });
+  }
+
+  Future<String?> _showInformationDialog(BuildContext context) {
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Selections you made'),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Selected shop:",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            Text("$_selectedShop"),
+            _selectedShop == SelectedShop.sKaupat.value
+                ? const Text("Selected file format:",
+                    style: TextStyle(fontWeight: FontWeight.bold))
+                : const SizedBox.shrink(),
+            _selectedShop == SelectedShop.sKaupat.value
+                ? _textFilePath == null
+                    ? const Text('Not set')
+                    : Text(_textFilePath!)
+                : const SizedBox.shrink(),
+            const Text("HTML file path:",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            _htmlFilePath == null
+                ? const Text('Not set')
+                : Text(_htmlFilePath!),
+            const Text("Selected file format:",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            Text("$_selectedFileFormat"),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   // Future<void> _saveTextFile() async {
@@ -114,18 +172,21 @@ class _MyHomePageState extends State<MyHomePage> {
               'Select a web store',
               style: TextStyle(fontSize: 20),
             ),
-            SelectedShopListTiles(
-                selectedShop: _selectedShop,
-                changeSelectedShop: _changeSelectedShop),
+            SelectedItemListTiles(
+              items: _shops,
+              selectedItem: _selectedShop,
+              changeSelectedItem: _changeSelectedShop,
+            ),
             const SizedBox(height: 10),
-            if (_selectedShop == SelectedShop.sKaupat)
+            if (_selectedShop == SelectedShop.sKaupat.value)
               const Text(
                 'Select a text file',
                 style: TextStyle(fontSize: 20),
               ),
-            if (_selectedShop == SelectedShop.sKaupat)
+            if (_selectedShop == SelectedShop.sKaupat.value)
               TextAndButton(
                 text: _textFilePath,
+                textDescription: 'A text',
                 buttonText: 'Open text file',
                 onPressed: () => _openTextFile(context),
               ),
@@ -136,9 +197,29 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             TextAndButton(
               text: _htmlFilePath,
+              textDescription: 'An HTML',
               buttonText: 'Open HTML file',
               onPressed: () => _openHtmlFile(context),
             ),
+            const SizedBox(height: 10),
+            const Text(
+              'Select an ouput file format',
+              style: TextStyle(fontSize: 20),
+            ),
+            SelectedItemListTiles(
+              items: _fileFormats,
+              selectedItem: _selectedFileFormat,
+              changeSelectedItem: _changeSelectedFileFormat,
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                fixedSize: const Size(100, 40),
+              ),
+              onPressed: () => _showInformationDialog(context),
+              child: const Text('Run'),
+            ),
+            // ====
             // Text('Selected text file: $_textFilePath'),
             // ElevatedButton(
             //     onPressed: () => _openTextFile(context),
@@ -175,85 +256,5 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
-  }
-}
-
-class TextAndButton extends StatelessWidget {
-  const TextAndButton(
-      {super.key,
-      required this.text,
-      required this.buttonText,
-      required this.onPressed});
-
-  final String text;
-  final String buttonText;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 450,
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: Text(text),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              fixedSize: const Size(100, 40),
-            ),
-            onPressed: onPressed,
-            // Align text to center
-
-            child: Text(
-              buttonText,
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class SelectedShopListTiles extends StatelessWidget {
-  const SelectedShopListTiles({
-    super.key,
-    required this.selectedShop,
-    required this.changeSelectedShop,
-  });
-
-  final SelectedShop? selectedShop;
-  final void Function(SelectedShop?)? changeSelectedShop;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: 160,
-            child: ListTile(
-              title: Text(SelectedShop.sKaupat.value),
-              leading: Radio<SelectedShop>(
-                value: SelectedShop.sKaupat,
-                groupValue: selectedShop,
-                onChanged: changeSelectedShop,
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 160,
-            child: ListTile(
-              title: Text(SelectedShop.kRuoka.value),
-              leading: Radio<SelectedShop>(
-                value: SelectedShop.kRuoka,
-                groupValue: selectedShop,
-                onChanged: changeSelectedShop,
-              ),
-            ),
-          ),
-        ]);
   }
 }
